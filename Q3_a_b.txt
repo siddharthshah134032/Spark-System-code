@@ -1,0 +1,73 @@
+Q3 A)
+val t1=System.currentTimeMillis
+val lines = sc.textFile("/yelpdatafall/review/review.csv")
+val sumrating = lines.map(line=>line.split("\\^")).map(line=>(line(2),line(3).toDouble)).reduceByKey(_+_)
+val count = lines.map(line=>line.split("\\^")).map(line=>(line(2),1)).reduceByKey(_+_)
+val avgRating=sumrating.join(count).map(entry=>(entry._1,entry._2._1/entry._2._2))
+val keySort = avgRating.sortByKey(true)
+val topTen = keySort.sortBy(_._2,false).take(10)
+val youtput =sc.parallelize(topTen)
+
+
+val lines1 = sc.textFile("/yelpdatafall/business/business.csv")
+val xoutput = lines1.map(line=>line.split("\\^")).map(line=>(line(0),line(1)+"\t"+line(2))).distinct().sortByKey(true);
+
+val zoutput = xoutput.join(youtput)
+zoutput.map(entry=>(entry._1,entry._2._1)).collect().foreach(println)
+val t2=System.currentTimeMillis
+println(t2-t1+"msecs")
+
+
+scala> println(t2-t1+"msecs")
+5748msecs
+
+
+(-OHH-CAN2QsCoIGHmst8qQ,1800 Lavaca StSte 109DowntownAustin, TX 78701   List(Hotels & Travel, Travel Services))
+(-7r5-GDmuXsgRhkBnN0nqA,220 Russell StSte 100Hadley, MA 01035   List(Active Life, Gyms, Fitness & Instruction))
+(-H10Dd0OMVWL843ErsV6VA,One Liberty Place1650 Market St, 36th FlMantuaPhiladelphia, PA 19103    List(Wedding Planning, Event Planning & Services, Party & Event Planning))                                                                                        Planning))
+(-6fMAgRynU3iL_ZbQV3eLw,1915 W Arrow RteUpland, CA 91786        List(Home Services, Heating & Air Conditioning/HVAC))
+(-J5wUuLJdr0s28InPxGkmw,1821 Murray AveSquirrel HillPittsburgh, PA 15217       List(Optometrists, Health and Medical))
+(-PTFC3mr_YWshXlvDu2w6g,The Garage Mall36 JFK St2nd FlHarvard SquareCambridge, MA 02138 List(Shopping, Home Decor, Home & Garden))
+(-7qJEs6xTssXME2itowdxA,4705 16th Ave NEUniversity DistrictSeattle, WA 98105   List(Books, Mags, Music and Video, Shopping, Bookstores))
+(-OHi0FOlVjVkdOhJQdTNOA,418 Semple StOaklandPittsburgh, PA 15213        List(Dive Bars, Bars, Nightlife))
+(-Tiy3NmLikBRA5NgMS_bWA,2826 Rio Grande StreetWest CampusAustin, TX 78705      List(Hair Salons, Beauty and Spas))
+(-O692rQHIFNJBst2LJRbvA,Manhattan ValleyManhattan, NY 10025     List(Local Services, IT Services & Computer Repair, Electronics Repair))
+
+
+Q3B)
+val t1=System.currentTimeMillis
+val lines = sc.textFile("/yelpdatafall/review/review.csv")
+val sumrating = lines.map(line=>line.split("\\^")).map(line=>(line(2),line(3).toDouble)).reduceByKey(_+_)
+val count = lines.map(line=>line.split("\\^")).map(line=>(line(2),1)).reduceByKey(_+_)
+val avgRating=sumrating.join(count).map(entry=>(entry._1,entry._2._1/entry._2._2))
+val keySort = avgRating.sortByKey(true)
+val topTen = keySort.sortBy(_._2,false).take(10)
+val youtput =sc.parallelize(topTen)
+
+val lines1 = sc.textFile("/yelpdatafall/business/business.csv")
+val xoutput = lines1.map(line=>line.split("\\^")).map(line=>(line(0),line(1)+"\t"+line(2))).distinct().sortByKey(true);
+val broadcastVal = sc.broadcast(xoutput);
+
+val zoutput = (broadcastVal.value).join(youtput)
+zoutput.map(entry=>(entry._1,entry._2._1)).collect().foreach(println)
+val t2=System.currentTimeMillis
+println(t2-t1+"msecs")
+
+
+
+scala> println(t2-t1+"msecs")
+4349msecs
+
+
+(-OHH-CAN2QsCoIGHmst8qQ,1800 Lavaca StSte 109DowntownAustin, TX 78701   List(Hotels & Travel, Travel Services))
+(-7r5-GDmuXsgRhkBnN0nqA,220 Russell StSte 100Hadley, MA 01035   List(Active Life, Gyms, Fitness & Instruction))
+(-H10Dd0OMVWL843ErsV6VA,One Liberty Place1650 Market St, 36th FlMantuaPhiladelphia, PA 19103    List(Wedding Planning, Event Planning & Services, Party & Event Planning))
+(-6fMAgRynU3iL_ZbQV3eLw,1915 W Arrow RteUpland, CA 91786        List(Home Services, Heating & Air Conditioning/HVAC))
+(-J5wUuLJdr0s28InPxGkmw,1821 Murray AveSquirrel HillPittsburgh, PA 15217        List(Optometrists, Health and Medical))
+(-PTFC3mr_YWshXlvDu2w6g,The Garage Mall36 JFK St2nd FlHarvard SquareCambridge, MA 02138 List(Shopping, Home Decor, Home & Garden))
+(-7qJEs6xTssXME2itowdxA,4705 16th Ave NEUniversity DistrictSeattle, WA 98105    List(Books, Mags, Music and Video, Shopping, Bookstores))
+(-OHi0FOlVjVkdOhJQdTNOA,418 Semple StOaklandPittsburgh, PA 15213        List(Dive Bars, Bars, Nightlife))
+(-Tiy3NmLikBRA5NgMS_bWA,2826 Rio Grande StreetWest CampusAustin, TX 78705       List(Hair Salons, Beauty and Spas))
+(-O692rQHIFNJBst2LJRbvA,Manhattan ValleyManhattan, NY 10025     List(Local Services, IT Services & Computer Repair, Electronics Repair))
+
+
